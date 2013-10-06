@@ -35,6 +35,9 @@ Win32Mouse::Win32Mouse( InputManager* creator, IDirectInput8* pDI, bool buffered
 	mDirectInput = pDI;
 	coopSetting = coopSettings;
 	mHwnd = 0;
+	mGrabMouse = ((coopSettings & DISCL_EXCLUSIVE) == DISCL_EXCLUSIVE);
+	mShowMouseState = mShowMouse = false;
+	ShowCursor(mShowMouseState);
 
 	static_cast<Win32InputManager*>(mCreator)->_setMouseUsed(true);
 }
@@ -164,8 +167,21 @@ void Win32Mouse::capture()
 			POINT point;
 			GetCursorPos(&point);
 			ScreenToClient(mHwnd, &point);
-			mState.X.abs = point.x;
-			mState.Y.abs = point.y;
+			bool isInsideWindow = false;
+			if( point.x >= 0 && point.x <= mState.width &&
+				point.y >= 0 && point.y <= mState.height )
+			{
+				mState.X.abs = point.x;
+				mState.Y.abs = point.y;
+				isInsideWindow = true;
+			}
+			
+			if( mShowMouse == false && mShowMouseState == isInsideWindow)
+			{
+				//Show cursor if its outside of the window and hide if its comming back.
+				mShowMouseState = !mShowMouseState;
+				ShowCursor(mShowMouseState);
+			}
 		}
 		else
 		{
@@ -213,4 +229,64 @@ bool Win32Mouse::_doMouseClick( int mouseButton, DIDEVICEOBJECTDATA& di )
 void Win32Mouse::setBuffered(bool buffered)
 {
 	mBuffered = buffered;
+}
+
+//--------------------------------------------------------------------------------------------------//
+void Win32Mouse::grab(bool grab)
+{
+	if(mGrabMouse == grab)
+		return;
+
+	mMouse->Unacquire();
+
+	if(grab)
+	{
+		//NOTE: DISCL_BACKGROUND | DISCL_EXCLUSIVE = invalid combination
+		coopSetting &= ~( DISCL_BACKGROUND | DISCL_NONEXCLUSIVE );
+		coopSetting |= DISCL_FOREGROUND | DISCL_EXCLUSIVE;
+	}
+	else
+	{
+		coopSetting &= ~DISCL_EXCLUSIVE;
+		coopSetting |= DISCL_NONEXCLUSIVE;
+	}
+
+	if( FAILED(mMouse->SetCooperativeLevel(mHwnd, coopSetting)) )
+		OIS_EXCEPT( E_General, "Win32Mouse::Win32Mouse >> Failed to set coop level" );
+
+	HRESULT hr = mMouse->Acquire();
+	if (FAILED(hr) && hr != DIERR_OTHERAPPHASPRIO)
+		OIS_EXCEPT( E_General, "Win32Mouse::Win32Mouse >> Failed to aquire mouse!" );
+
+	mGrabMouse = grab;
+}
+
+//--------------------------------------------------------------------------------------------------//
+void Win32Mouse::hide(bool hide)
+{
+	mShowMouse = !hide;
+	if(mShowMouseState != mShowMouse)
+	{
+		mShowMouseState = mShowMouse;
+		ShowCursor(mShowMouseState);
+	}
+}
+
+//--------------------------------------------------------------------------------------------------//
+void Win32Mouse::setPosition(unsigned int x, unsigned int y)
+{
+	if(mGrabMouse)
+	{
+		mState.X.abs = x;
+		mState.Y.abs = y;
+	}
+	else
+	{
+		POINT point;
+		point.x = x;
+		point.y = y;
+		ClientToScreen(mHwnd, &point);
+		SetCursorPos(point.x, point.y);
+	}
+
 }

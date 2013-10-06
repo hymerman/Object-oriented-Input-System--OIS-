@@ -66,9 +66,18 @@ namespace OIS
 		//! Method for retrieving the XWindow Handle
 		Window _getWindow() {return window;}
 
-		//! Internal method for checking if regrabbing is needed
-		void _setGrabState(bool grab) {mGrabs = grab;}
-		bool _getGrabState() {return mGrabs;}
+		//! Internal methods for mouse-keyboard communication.
+		//! alt+tab will release grab (loose focus), mouse click will regain grab (regain focus).
+		//! This way the user has always a chance to release the grab.
+		void _setWindowFocus(bool hasFocus) {mHasFocus = hasFocus;}
+		bool _hasWindowFocus() {return mHasFocus;}
+
+		//! Internal method, used for flagging keyboard grab
+		bool _getKeyboardGrabState() { return mGrab; }
+
+		//! Internal method, used for flagging keyboard grab
+		void _setKeyboardGrabState(bool used) { mGrab = used; }
+
 
 		//! Internal method, used for flaggin keyboard as available/unavailable for creation
 		void _setKeyboardUsed(bool used) {keyboardUsed = used; }
@@ -97,8 +106,8 @@ namespace OIS
 		Window window;
 		
 		/// Keyboard, Mouse Settings
-		bool grabMouse, grabKeyboard;
-		bool mGrabs;
+		bool mGrab;
+		bool mHasFocus;
 		bool hideMouse;
 	};
 }
