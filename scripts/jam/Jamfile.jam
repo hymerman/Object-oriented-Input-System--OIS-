@@ -1,0 +1,31 @@
+SubDir OISTOP ;
+
+IncludeModule copydirectory ;
+
+#C.C++Exceptions * : true : * ;
+C.CompileOptions outputastree ;
+C.RuntimeType * : dynamic ;
+
+DEPCACHE.standard = ois.$(CONFIG).depcache ;
+DEPCACHE = standard ;
+
+# Common
+
+OIS_INCLUDE_DIRECTORIES =
+	$(OISTOP)/../../includes
+;
+
+# Lib
+
+LOCATE_TARGET = $(OISTOP)/../../build/ois/$(PLATFORM)/$(CONFIG) ;
+OIS_LIB_SRC_PATTERN = $(OISTOP)/../../src/*@=*.cpp@=*.h ;
+OIS_LIB_WIN32SRC_PATTERN = $(OISTOP)/../../src/win32/*@=*.cpp@=*.h ;
+OIS_LIB_SRCS = $(OIS_LIB_SRC_PATTERN:W) $(OIS_LIB_WIN32SRC_PATTERN:W) ;
+
+C.IncludeDirectories ois : $(OIS_INCLUDE_DIRECTORIES) ;
+#C.PrecompiledHeader ois : $(OISTOP)/../../src/ois : $(OIS_LIB_SRCS) ;
+C.OutputPath ois : $(OISTOP)/../../lib/$(PLATFORM)/$(CONFIG) ;
+C.OutputName ois : ois ;
+C.Library ois : $(OIS_LIB_SRCS) ;
+
+AutoSourceGroup ois : $(OIS_LIB_SRCS) ;
