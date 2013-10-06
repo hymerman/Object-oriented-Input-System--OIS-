@@ -1,3 +1,7 @@
+This is a branch specifically for changes to get OIS in a state ready to use with
+JamPlus, and bengine, a personal project. It is not intended to ever be pulled back to
+master.
+
 ======================================================================================
 ================ LICENSE =============================================================
 ======================================================================================
