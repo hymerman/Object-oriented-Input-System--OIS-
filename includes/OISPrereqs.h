@@ -167,7 +167,7 @@ namespace OIS
 	{
 	public:
 		Component() : cType(OIS_Unknown) {};
-		Component(ComponentType type) : cType(type) {};
+		explicit Component(ComponentType type) : cType(type) {};
 		//! Indicates what type of coponent this is
 		ComponentType cType;
 	};
@@ -177,7 +177,7 @@ namespace OIS
 	{
 	public:
 		Button() : Component(OIS_Button), pushed(false) {}
-		Button(bool bPushed) : Component(OIS_Button), pushed(bPushed) {}
+		explicit Button(bool bPushed) : Component(OIS_Button), pushed(bPushed) {}
 		//! true if pushed, false otherwise
 		bool pushed;
 	};
@@ -207,10 +207,10 @@ namespace OIS
 	public:
 		Vector3() {}
 		Vector3(float _x, float _y, float _z) : Component(OIS_Vector3), x(_x), y(_y), z(_z) {};
-		
+
 		//! X component of vector
 		float x;
-		
+
 		//! Y component of vector
 		float y;
 
