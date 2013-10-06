@@ -20,7 +20,9 @@ OIS_INCLUDE_DIRECTORIES =
 LOCATE_TARGET = $(OISTOP)/../../build/ois/$(PLATFORM)/$(CONFIG) ;
 OIS_LIB_SRC_PATTERN = $(OISTOP)/../../src/*@=*.cpp@=*.h ;
 OIS_LIB_WIN32SRC_PATTERN = $(OISTOP)/../../src/win32/*@=*.cpp@=*.h ;
-OIS_LIB_SRCS = $(OIS_LIB_SRC_PATTERN:W) $(OIS_LIB_WIN32SRC_PATTERN:W) ;
+OIS_LIB_INCLUDE_PATTERN = $(OISTOP)/../../includes/*@=*.cpp@=*.h ;
+OIS_LIB_WIN32INCLUDE_PATTERN = $(OISTOP)/../../includes/win32/*@=*.cpp@=*.h ;
+OIS_LIB_SRCS = $(OIS_LIB_SRC_PATTERN:W) $(OIS_LIB_WIN32SRC_PATTERN:W) $(OIS_LIB_INCLUDE_PATTERN:W) $(OIS_LIB_WIN32INCLUDE_PATTERN:W) ;
 
 C.IncludeDirectories ois : $(OIS_INCLUDE_DIRECTORIES) ;
 #C.PrecompiledHeader ois : $(OISTOP)/../../src/ois : $(OIS_LIB_SRCS) ;
